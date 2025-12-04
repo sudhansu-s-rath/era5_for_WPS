@@ -1,0 +1,35 @@
+# Ignore downloaded data directories (large files)
+era5_rda_*/
+era5_for_wps/
+testGFS/
+
+# Ignore WPS intermediate files and conversion directory
+era5_to_int-main/
+
+# Ignore SLURM log files
+*.out
+*.err
+
+# Ignore temporary files
+*.tmp
+*.log
+test_*.nc
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Ignore Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Keep these important files (will be included in repo):
+# - download_era5_rda.py
+# - download_era5_rda.slurm
+# - submit_era5_rda_download.sh
+# - download_era5_rda_README.md
+# - download_era5_cds.py
+# - download_era5_cds.slurm
+# - submit_era5_cds.sh
