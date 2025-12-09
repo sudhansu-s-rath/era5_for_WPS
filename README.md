@@ -155,7 +155,8 @@ era5_rda_2014/
 
 ### 2.1 About era5_to_int
 
-The `era5_to_int.py` script (located in `era5_to_int-main/`) converts ERA5 NetCDF files to WPS intermediate format:
+The `era5_to_int.py` script (located in `era5_to_int-main/`) converts ERA5 NetCDF files to WPS intermediate format. This is a modified version of the NCAR era5_to_int tool (https://github.com/NCAR/era5_to_int).
+
 - **Input:** ERA5 NetCDF files from Step 1
 - **Output:** WPS intermediate files (GRIB format) that metgrid.exe can read
 - **Variables:** Automatically extracts all variables required by WPS/WRF
@@ -393,10 +394,10 @@ Solution: Check file naming: ERA5:YYYY-MM-DD_HH
 ## Additional Resources
 
 - **WRF Forum - ERA5 Usage Guide:** https://forum.mmm.ucar.edu/threads/how-to-use-era5-data-from-copernicus-database.19293/
+- **NCAR era5_to_int (Step 2 tool):** https://github.com/NCAR/era5_to_int
 - **ERA5 Documentation:** https://confluence.ecmwf.int/display/CKB/ERA5
 - **NCAR RDA ds633.0:** https://rda.ucar.edu/datasets/ds633.0/
 - **WRF Users Guide:** https://www2.mmm.ucar.edu/wrf/users/
-- **era5_to_int GitHub:** https://github.com/chrisberr/era5-to-wps
 
 ---
 
