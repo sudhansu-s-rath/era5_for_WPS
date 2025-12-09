@@ -6,6 +6,8 @@ Complete workflow for preparing ERA5 reanalysis data for WRF-WPS preprocessing s
 
 This repository provides a complete multi-step workflow to make ERA5 reanalysis data compatible with the WRF Preprocessing System (WPS). The process converts hourly ERA5 NetCDF data into WPS intermediate format (GRIB) files that can be ingested by `metgrid.exe`.
 
+**Note:** Variable selection and download approach are based on recommendations from the WRF forum discussion: [How to use ERA5 data from Copernicus database](https://forum.mmm.ucar.edu/threads/how-to-use-era5-data-from-copernicus-database.19293/)
+
 ### Workflow Steps
 
 ```
@@ -390,6 +392,7 @@ Solution: Check file naming: ERA5:YYYY-MM-DD_HH
 
 ## Additional Resources
 
+- **WRF Forum - ERA5 Usage Guide:** https://forum.mmm.ucar.edu/threads/how-to-use-era5-data-from-copernicus-database.19293/
 - **ERA5 Documentation:** https://confluence.ecmwf.int/display/CKB/ERA5
 - **NCAR RDA ds633.0:** https://rda.ucar.edu/datasets/ds633.0/
 - **WRF Users Guide:** https://www2.mmm.ucar.edu/wrf/users/
