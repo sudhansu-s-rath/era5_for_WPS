@@ -41,12 +41,12 @@ which wget || {
     exit 1
 }
 
-# Configuration
-YEAR="2014"
-MONTH="5"
-START_DAY=1
-END_DAY=31
-OUT_DIR="/data/mgeorge7/sudhansu_WORK/grb_files/era5_rda_2014may"
+# Configuration (can be overridden via --export when submitting job)
+YEAR="${YEAR:-2014}"
+MONTH="${MONTH:-5}"
+START_DAY="${START_DAY:-1}"
+END_DAY="${END_DAY:-31}"
+OUT_DIR="${OUT_DIR:-/data/mgeorge7/sudhansu_WORK/grb_files/era5_rda_2014may}"
 
 # Optional: Specify variables (leave empty for all)
 # VARS="Z,T,U,V,Q"  # Example: only atmospheric variables
