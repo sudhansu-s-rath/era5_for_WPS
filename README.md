@@ -2,6 +2,23 @@
 
 Complete workflow for preparing ERA5 reanalysis data for WRF-WPS preprocessing system.
 
+---
+
+## ⚠️ Important Reminder: NLCD Data Requirements
+
+**For multi-year experiments:** NLCD (National Land Cover Database) geographical data must correspond to the year of each simulation run.
+
+- **Current setup:** Using recent NLCD-generated `geo_em.*` files
+- **Required for experiments:** Recreate `geo_em.*` files with NLCD data matching each experiment year
+- **Action needed:** Run `geogrid.exe` with year-specific NLCD datasets before processing each year's meteorological data
+
+**Example:**
+- 2014 simulation → Use NLCD 2013 or 2011 data
+- 2016 simulation → Use NLCD 2016 data
+- Ensures land cover (urban extent, vegetation, etc.) matches simulation period
+
+---
+
 ## Overview
 
 This repository provides a complete multi-step workflow to make ERA5 reanalysis data compatible with the WRF Preprocessing System (WPS). The process converts hourly ERA5 NetCDF data into WPS intermediate format (GRIB) files that can be ingested by `metgrid.exe`.
@@ -236,51 +253,109 @@ Each file contains all meteorological variables needed by WRF at one timestep.
 
 ## STEP 3: WPS Processing (metgrid.exe)
 
-### 3.1 Configure WPS
+### 3.1 Skip ungrib.exe (Use ERA5 Intermediate Files Directly)
 
-**Copy intermediate files to WPS directory:**
-```bash
-cd /path/to/WPS
-cp /data/mgeorge7/sudhansu_WORK/grb_files/era5_to_int-main/intfiles/ERA5:* .
-```
+**Important:** Since ERA5 data has already been converted to WPS intermediate format (`ERA5:YYYY-MM-DD_HH`) by `era5_to_int.py`, the ungrib step is **NOT needed**.
 
-**Edit namelist.wps:**
+❌ **Do NOT:**
+- Link or use a Vtable
+- Run `ungrib.exe`
+- Copy intermediate files to WPS directory
+
+✅ **Instead:** Reference intermediate files directly via absolute path in `namelist.wps`
+
+### 3.2 Configure WPS namelist.wps
+
+**Edit namelist.wps with correct paths and dates:**
+
 ```fortran
 &share
  wrf_core = 'ARW',
- max_dom = 1,
- start_date = '2014-05-01_00:00:00',
- end_date   = '2014-05-31_23:00:00',
+ max_dom = 3,
+ start_date = '2014-05-01_00:00:00','2014-05-01_00:00:00','2014-05-01_00:00:00',
+ end_date   = '2014-05-31_23:00:00','2014-05-31_23:00:00','2014-05-31_23:00:00',
  interval_seconds = 3600,  ! Hourly data
  io_form_geogrid = 2,
 /
 
 &metgrid
- fg_name = 'ERA5'          ! Prefix of intermediate files
+ fg_name = '/data/mgeorge7/sudhansu_WORK/grb_files/era5_to_int-main/intfiles/ERA5',
  io_form_metgrid = 2,
+ opt_output_from_metgrid_path = '/data/mgeorge7/sudhansu_WORK/met_files/',
 /
 ```
 
-### 3.2 Run metgrid.exe
+**Key Configuration Points:**
+
+1. **fg_name with absolute path:** Points directly to ERA5 intermediate files
+   - WPS will read: `/data/.../intfiles/ERA5:2014-05-01_00`, `ERA5:2014-05-01_01`, etc.
+   - No need to copy or symlink files
+
+2. **Correct date range:** Must match your ERA5 intermediate file timestamps
+   - ⚠️ **Critical:** If dates don't match, metgrid will fail with:
+     ```
+     WARNING: Couldn't open file ... ERA5:YYYY-MM-DD_HH
+     ERROR: The mandatory field TT was not found in any input data.
+     ```
+   - Verify intermediate file dates: `ls /data/.../intfiles/ERA5:*`
+
+3. **opt_output_from_metgrid_path:** Specify output directory for `met_em.*` files
+
+### 3.3 Use Default WPS Tables (No Modifications Needed)
+
+ERA5 intermediate files created by `era5_to_int.py` already use WPS-native variable names and soil-layer definitions.
+
+✅ **Use default tables:**
+- `WPS/metgrid/METGRID.TBL` (default)
+- `WPS/ungrib/Variable_Tables/SOILLEVEL.TBL` (default)
+
+❌ **Do NOT modify or create custom:**
+- ERA5-specific METGRID.TBL
+- ERA5-specific Vtable
+- Custom SOILLEVEL.TBL
+
+### 3.4 Run metgrid.exe
 
 ```bash
 cd /path/to/WPS
-./metgrid.exe
+./metgrid.exe >& metgrid.log &
 ```
 
-**Output:**
+**Monitor progress:**
+```bash
+tail -f metgrid.log
 ```
-met_em.d01.2014-05-01_00:00:00.nc
-met_em.d01.2014-05-01_01:00:00.nc
+
+**Successful output:**
+```
+Processing domain 1 of 3
+Processing 2014-05-01_00
+Processing 2014-05-01_01
 ...
-met_em.d01.2014-05-31_23:00:00.nc
+Processing 2014-05-31_23
+Successful completion of metgrid
 ```
 
-### 3.3 Ready for WRF
+### 3.5 Output Files
+
+Meteorological files will be created in the specified output directory:
+
+```
+/data/mgeorge7/sudhansu_WORK/met_files/
+├── met_em.d01.2014-05-01_00:00:00.nc
+├── met_em.d01.2014-05-01_01:00:00.nc
+├── ...
+├── met_em.d01.2014-05-31_23:00:00.nc
+├── met_em.d02.2014-05-01_00:00:00.nc
+├── ...
+└── met_em.d03.2014-05-31_23:00:00.nc
+```
+
+### 3.6 Ready for WRF
 
 The `met_em.*` files are now ready for WRF's `real.exe`:
-1. Copy `met_em.*` files to WRF run directory
-2. Configure `namelist.input`
+1. Copy or symlink `met_em.*` files to WRF run directory
+2. Configure `namelist.input` with matching dates
 3. Run `real.exe` followed by `wrf.exe`
 
 ---
