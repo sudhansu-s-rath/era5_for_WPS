@@ -7,19 +7,19 @@
 #   ./download_month.sh 7        # Downloads July 2014
 #   ./download_month.sh 8 2015   # Downloads August 2015
 
-if [ $# -lt 1 ]; then
-    echo "Usage: $0 <month_number> [year]"
+
+if [ $# -ne 2 ]; then
+    echo "Usage: $0 <month_number> <year>"
     echo ""
     echo "Examples:"
-    echo "  $0 6      # June 2014"
-    echo "  $0 7      # July 2014"
-    echo "  $0 8      # August 2014"
-    echo "  $0 9      # September 2014"
+    echo "  $0 6 2014      # June 2014"
+    echo "  $0 7 2014      # July 2014"
+    echo "  $0 8 2015      # August 2015"
     exit 1
 fi
 
 MONTH=$1
-YEAR=${2:-2014}  # Default to 2014 if not specified
+YEAR=$2
 
 # Month names for directory
 declare -A MONTH_NAMES=(
